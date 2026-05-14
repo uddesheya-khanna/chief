@@ -65,7 +65,7 @@ export function SignalsDataTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-border/80 bg-card">
       <Table>
         <TableHeader>
           <TableRow className="border-border/60 hover:bg-transparent">
@@ -74,6 +74,9 @@ export function SignalsDataTable({
             </TableHead>
             <TableHead className="h-12 text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
               Type
+            </TableHead>
+            <TableHead className="h-12 max-w-[14rem] text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
+              Implication
             </TableHead>
             <TableHead className="h-12 text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
               Title
@@ -119,6 +122,13 @@ export function SignalsDataTable({
                       ev.event_type as keyof typeof EVENT_TYPE_LABEL
                     ] ?? ev.event_type}
                   </Badge>
+                </TableCell>
+                <TableCell className="max-w-[14rem] align-middle text-[13px] text-muted-foreground">
+                  {ev.implication?.trim() ? (
+                    <span className="line-clamp-2">{ev.implication}</span>
+                  ) : (
+                    <span className="text-muted-foreground/70">—</span>
+                  )}
                 </TableCell>
                 <TableCell className="max-w-[min(40vw,24rem)] align-middle text-sm text-foreground">
                   <Link

@@ -171,6 +171,22 @@ export function ManualEventForm({
             </p>
           ) : null}
         </div>
+
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="metadata_json">Metadata (JSON object, optional)</Label>
+          <Textarea
+            id="metadata_json"
+            name="metadata_json"
+            rows={4}
+            placeholder='{"source":"manual","tags":["pricing"]}'
+            className="min-h-[96px] resize-y font-mono text-[13px]"
+          />
+          {state?.fieldErrors?.metadata_json ? (
+            <p className="text-xs text-destructive">
+              {state.fieldErrors.metadata_json[0]}
+            </p>
+          ) : null}
+        </div>
       </div>
 
       <div className="flex justify-end border-t border-border/60 pt-6">

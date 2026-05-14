@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { z } from "zod";
+
 import { getTrackedEntity } from "@/modules/entities/loaders";
+import { countIntelligenceEventsAfter } from "@/modules/events/loaders";
 import { entitySignalDetailHref } from "@/modules/events/event-url";
 import {
   manualCreateEventFormSchema,
@@ -29,8 +32,10 @@ function parseOptionalTimestamptz(raw: string): string | null {
   return d.toISOString();
 }
 
-function revalidateEntitySignals(orgSlug: string, entityId: string) {
+function revalidateIntelligenceSurfaces(orgSlug: string, entityId: string) {
   revalidatePath(`/w/${orgSlug}/entities/${entityId}`, "layout");
+  revalidatePath(`/w/${orgSlug}/feed`);
+  revalidatePath(`/w/${orgSlug}/dashboard`);
 }
 
 export async function createManualIntelligenceEvent(
@@ -70,6 +75,7 @@ export async function createManualIntelligenceEvent(
     event_type: String(formData.get("event_type") ?? ""),
     signal_score: String(formData.get("signal_score") ?? "50"),
     published_at: String(formData.get("published_at") ?? ""),
+    metadata_json: String(formData.get("metadata_json") ?? ""),
   });
 
   if (!parsed.success) {
@@ -86,9 +92,32 @@ export async function createManualIntelligenceEvent(
     event_type,
     signal_score,
     published_at,
+    metadata_json,
   } = parsed.data;
 
-  const publishedAtIso = parseOptionalTimestamptz(published_at);
+  const publishedAtIso = parseOptionalTimestamptz(published_at ?? "");
+
+  let metadata: Json = {};
+  const metaRaw = metadata_json?.trim();
+  if (metaRaw) {
+    try {
+      const parsedMeta = JSON.parse(metaRaw) as unknown;
+      if (
+        parsedMeta === null ||
+        typeof parsedMeta !== "object" ||
+        Array.isArray(parsedMeta)
+      ) {
+        return {
+          fieldErrors: {
+            metadata_json: ["Metadata must be a JSON object."],
+          },
+        };
+      }
+      metadata = parsedMeta as Json;
+    } catch {
+      return { fieldErrors: { metadata_json: ["Invalid JSON."] } };
+    }
+  }
 
   const { data, error } = await ctx.supabase
     .from("intelligence_events")
@@ -103,7 +132,7 @@ export async function createManualIntelligenceEvent(
       source_type,
       event_type,
       signal_score,
-      metadata: {} as Json,
+      metadata,
       published_at: publishedAtIso,
     })
     .select("id")
@@ -113,7 +142,11 @@ export async function createManualIntelligenceEvent(
     return { formError: error.message };
   }
 
-  revalidateEntitySignals(orgSlug, entityId);
+  if (!data) {
+    return { formError: "Failed to create signal." };
+  }
+
+  revalidateIntelligenceSurfaces(orgSlug, entityId);
   redirect(entitySignalDetailHref(orgSlug, entityId, data.id));
 }
 
@@ -149,7 +182,7 @@ export async function dismissIntelligenceEvent(formData: FormData): Promise<void
     return;
   }
 
-  revalidateEntitySignals(orgSlug, entityId);
+  revalidateIntelligenceSurfaces(orgSlug, entityId);
 }
 
 export async function restoreIntelligenceEvent(formData: FormData): Promise<void> {
@@ -177,7 +210,114 @@ export async function restoreIntelligenceEvent(formData: FormData): Promise<void
     return;
   }
 
-  revalidateEntitySignals(orgSlug, entityId);
+  revalidateIntelligenceSurfaces(orgSlug, entityId);
+}
+
+const workspaceEventIdSchema = z.object({
+  orgSlug: z.string().min(1),
+  eventId: z.string().uuid(),
+});
+
+export async function dismissIntelligenceEventFromWorkspace(input: {
+  orgSlug: string;
+  eventId: string;
+}): Promise<void> {
+  const { orgSlug, eventId } = workspaceEventIdSchema.parse(input);
+  const ctx = await getWorkspaceContext(orgSlug);
+  if (!ctx) {
+    return;
+  }
+
+  const {
+    data: { user },
+  } = await ctx.supabase.auth.getUser();
+  if (!user) {
+    return;
+  }
+
+  const { data: row, error: selErr } = await ctx.supabase
+    .from("intelligence_events")
+    .select("entity_id")
+    .eq("id", eventId)
+    .eq("organization_id", ctx.organization.id)
+    .maybeSingle();
+
+  if (selErr || !row) {
+    console.error("[events:dismissFeed:lookup]", selErr?.message);
+    return;
+  }
+
+  const { error } = await ctx.supabase
+    .from("intelligence_events")
+    .update({
+      is_dismissed: true,
+      dismissed_at: new Date().toISOString(),
+      dismissed_by: user.id,
+    })
+    .eq("id", eventId)
+    .eq("organization_id", ctx.organization.id);
+
+  if (error) {
+    console.error("[events:dismissFeed]", error.message);
+    return;
+  }
+
+  revalidateIntelligenceSurfaces(orgSlug, row.entity_id);
+}
+
+export async function restoreIntelligenceEventFromWorkspace(input: {
+  orgSlug: string;
+  eventId: string;
+}): Promise<void> {
+  const { orgSlug, eventId } = workspaceEventIdSchema.parse(input);
+  const ctx = await getWorkspaceContext(orgSlug);
+  if (!ctx) {
+    return;
+  }
+
+  const { data: row, error: selErr } = await ctx.supabase
+    .from("intelligence_events")
+    .select("entity_id")
+    .eq("id", eventId)
+    .eq("organization_id", ctx.organization.id)
+    .maybeSingle();
+
+  if (selErr || !row) {
+    console.error("[events:restoreFeed:lookup]", selErr?.message);
+    return;
+  }
+
+  const { error } = await ctx.supabase
+    .from("intelligence_events")
+    .update({
+      is_dismissed: false,
+      dismissed_at: null,
+      dismissed_by: null,
+    })
+    .eq("id", eventId)
+    .eq("organization_id", ctx.organization.id);
+
+  if (error) {
+    console.error("[events:restoreFeed]", error.message);
+    return;
+  }
+
+  revalidateIntelligenceSurfaces(orgSlug, row.entity_id);
+}
+
+export async function getWorkspaceFeedFreshEventCount(
+  orgSlug: string,
+  afterIso: string,
+): Promise<number> {
+  const ctx = await getWorkspaceContext(orgSlug);
+  if (!ctx) {
+    return 0;
+  }
+  return countIntelligenceEventsAfter(
+    ctx.supabase,
+    ctx.organization.id,
+    afterIso,
+  );
 }
 
 export async function updateIntelligenceEventSignalScore(
@@ -211,7 +351,7 @@ export async function updateIntelligenceEventSignalScore(
     return { formError: error.message };
   }
 
-  revalidateEntitySignals(orgSlug, entityId);
+  revalidateIntelligenceSurfaces(orgSlug, entityId);
   return null;
 }
 

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -14,12 +15,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type UserMenuProps = {
-  email: string;
-  displayName: string | null;
+  email?: string | null;
+  displayName?: string | null;
 };
 
 export function UserMenu({ email, displayName }: UserMenuProps) {
-  const label = displayName?.trim() || email.split("@")[0] || "Account";
+  const safeEmail = email?.trim() ?? "";
+  const label =
+    displayName?.trim() ||
+    (safeEmail.includes("@") ? safeEmail.split("@")[0] : safeEmail) ||
+    "Account";
+  const emailLine = safeEmail || "—";
 
   return (
     <DropdownMenu>
@@ -30,25 +36,29 @@ export function UserMenu({ email, displayName }: UserMenuProps) {
         <span className="truncate">{label}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="font-normal">
-          <span className="block truncate text-xs text-muted-foreground">
-            {email}
-          </span>
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="font-normal">
+            <span className="block truncate text-xs text-muted-foreground">
+              {emailLine}
+            </span>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="p-0 focus:bg-transparent">
-          <form action={signOut} className="w-full">
-            <Button
-              type="submit"
-              variant="ghost"
-              size="sm"
-              className="h-8 w-full justify-start gap-2 px-2 font-normal"
-            >
-              <LogOut className="size-4" />
-              Sign out
-            </Button>
-          </form>
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          <DropdownMenuItem className="p-0 focus:bg-transparent">
+            <form action={signOut} className="w-full">
+              <Button
+                type="submit"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-full justify-start gap-2 px-2 font-normal"
+              >
+                <LogOut className="size-4" />
+                Sign out
+              </Button>
+            </form>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

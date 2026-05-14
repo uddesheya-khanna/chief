@@ -15,6 +15,7 @@ import {
 } from "@/modules/events/constants";
 import { entitySignalsHref } from "@/modules/events/event-url";
 import type { IntelligenceEventRow } from "@/modules/events/loaders";
+import type { Json } from "@/types/database";
 
 function formatDetected(iso: string) {
   try {
@@ -24,6 +25,21 @@ function formatDetected(iso: string) {
     }).format(new Date(iso));
   } catch {
     return "—";
+  }
+}
+
+function formatMetadataBlock(metadata: Json): string | null {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return null;
+  }
+  const keys = Object.keys(metadata as object);
+  if (keys.length === 0) {
+    return null;
+  }
+  try {
+    return JSON.stringify(metadata, null, 2);
+  } catch {
+    return null;
   }
 }
 
@@ -50,6 +66,7 @@ export function EventDetailView({
 }) {
   const band = signalBand(event.signal_score);
   const backHref = entitySignalsHref(orgSlug, entityId);
+  const metadataBlock = formatMetadataBlock(event.metadata);
 
   return (
     <div className="space-y-8">
@@ -82,7 +99,7 @@ export function EventDetailView({
                 <span className="text-muted-foreground">Dismissed</span>
               ) : null}
             </div>
-            <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            <h1 className="font-heading text-2xl font-medium tracking-tight text-foreground sm:text-[1.65rem]">
               {event.title}
             </h1>
             <p className="font-mono text-[12px] text-muted-foreground">
@@ -159,6 +176,17 @@ export function EventDetailView({
             </Meta>
           ) : null}
         </section>
+
+        {metadataBlock ? (
+          <section className="space-y-2">
+            <h2 className="text-[12px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
+              Metadata
+            </h2>
+            <pre className="max-h-64 overflow-auto rounded-lg border border-border/60 bg-muted/25 p-4 font-mono text-[12px] leading-relaxed text-foreground">
+              {metadataBlock}
+            </pre>
+          </section>
+        ) : null}
 
         <Separator className="opacity-60" />
 

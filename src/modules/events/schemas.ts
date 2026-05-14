@@ -21,6 +21,7 @@ export const manualCreateEventFormSchema = z.object({
     .min(0, "Score must be at least 0.")
     .max(100, "Score cannot exceed 100."),
   published_at: z.string().trim().optional().or(z.literal("")),
+  metadata_json: z.string().max(16000).optional().or(z.literal("")),
 });
 
 export type ManualCreateEventFormInput = z.infer<

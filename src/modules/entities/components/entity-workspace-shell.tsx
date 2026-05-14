@@ -18,7 +18,7 @@ export function EntityWorkspaceShell({
   children: ReactNode;
 }) {
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <EntityDetailHeader orgSlug={orgSlug} entity={entity} />
       <EntityDetailTabNav orgSlug={orgSlug} entityId={entity.id} />
       <div className="min-h-[12rem]">{children}</div>

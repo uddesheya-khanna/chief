@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useSelectedLayoutSegments } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { entityDetailHref } from "@/modules/entities/entity-url";
@@ -10,18 +10,24 @@ import {
   entitySignalsHref,
 } from "@/modules/events/event-url";
 
+type EntitySectionTab = "Timeline" | "Signals" | "Settings";
+
 const tabs = (orgSlug: string, entityId: string) =>
   [
-    { label: "Timeline", href: entityDetailHref(orgSlug, entityId) },
-    { label: "Signals", href: entitySignalsHref(orgSlug, entityId) },
-    { label: "Settings", href: entitySettingsHref(orgSlug, entityId) },
+    { label: "Timeline" as const, href: entityDetailHref(orgSlug, entityId) },
+    { label: "Signals" as const, href: entitySignalsHref(orgSlug, entityId) },
+    { label: "Settings" as const, href: entitySettingsHref(orgSlug, entityId) },
   ] as const;
 
-function normalizePath(p: string) {
-  if (p.length > 1 && p.endsWith("/")) {
-    return p.slice(0, -1);
+function activeTabFromSegments(segments: readonly string[]): EntitySectionTab {
+  const root = segments[0];
+  if (root === "settings") {
+    return "Settings";
   }
-  return p;
+  if (root === "signals") {
+    return "Signals";
+  }
+  return "Timeline";
 }
 
 export function EntityDetailTabNav({
@@ -31,7 +37,8 @@ export function EntityDetailTabNav({
   orgSlug: string;
   entityId: string;
 }) {
-  const pathname = normalizePath(usePathname());
+  const segments = useSelectedLayoutSegments();
+  const activeLabel = activeTabFromSegments(segments);
   const items = tabs(orgSlug, entityId);
 
   return (
@@ -40,12 +47,7 @@ export function EntityDetailTabNav({
       className="flex flex-wrap gap-1 border-b border-border/70 pb-px"
     >
       {items.map((tab) => {
-        const tabPath = normalizePath(tab.href);
-        const isTimeline = tab.label === "Timeline";
-        const entityBase = normalizePath(entityDetailHref(orgSlug, entityId));
-        const active = isTimeline
-          ? pathname === entityBase
-          : pathname === tabPath || pathname.startsWith(`${tabPath}/`);
+        const active = tab.label === activeLabel;
 
         return (
           <Link

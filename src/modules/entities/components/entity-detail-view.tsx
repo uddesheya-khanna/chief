@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowUpRight, Pencil } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { EntityActiveToggle } from "@/modules/entities/components/entity-active-toggle";
 import { EntityTypeBadge } from "@/modules/entities/components/entity-type-badge";

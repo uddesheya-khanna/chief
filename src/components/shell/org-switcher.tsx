@@ -8,6 +8,7 @@ import type { UserOrganization } from "@/modules/org/loaders";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -38,25 +39,29 @@ export function OrgSwitcher({ organizations, currentSlug }: OrgSwitcherProps) {
         <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="start">
-        <DropdownMenuLabel className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Workspaces
-        </DropdownMenuLabel>
-        {organizations.map((org) => (
-          <DropdownMenuItem
-            key={org.id}
-            className={org.slug === currentSlug ? "bg-accent/60" : ""}
-            onClick={() =>
-              router.push(workspaceHref(org.slug, "/dashboard"))
-            }
-          >
-            <span className="truncate">{org.name}</span>
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Workspaces
+          </DropdownMenuLabel>
+          {organizations.map((org) => (
+            <DropdownMenuItem
+              key={org.id}
+              className={org.slug === currentSlug ? "bg-accent/60" : ""}
+              onClick={() =>
+                router.push(workspaceHref(org.slug, "/dashboard"))
+              }
+            >
+              <span className="truncate">{org.name}</span>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/onboarding")}>
-          <Plus className="size-4" />
-          New workspace
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={() => router.push("/onboarding")}>
+            <Plus className="size-4" />
+            New workspace
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

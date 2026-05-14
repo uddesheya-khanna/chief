@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Toaster } from "sonner";
 
 import { AppHeader } from "@/components/shell/app-header";
 import { AppSidebar } from "@/components/shell/app-sidebar";
@@ -50,22 +51,25 @@ export default async function WorkspaceLayout({
     .maybeSingle();
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <div className="hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:shrink-0">
-        <AppSidebar orgSlug={orgSlug} organizations={organizations} />
+    <>
+      <div className="flex min-h-screen bg-background">
+        <div className="hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:shrink-0">
+          <AppSidebar orgSlug={orgSlug} organizations={organizations} />
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <AppHeader
+            orgSlug={orgSlug}
+            organizations={organizations}
+            workspaceName={ctx.organization.name}
+            userEmail={profile?.email ?? user.email ?? ""}
+            userDisplayName={profile?.full_name ?? null}
+          />
+          <ContentContainer className="flex-1 py-8 sm:py-10">
+            <div className="min-h-[50vh]">{children}</div>
+          </ContentContainer>
+        </div>
       </div>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <AppHeader
-          orgSlug={orgSlug}
-          organizations={organizations}
-          workspaceName={ctx.organization.name}
-          userEmail={profile?.email ?? user.email ?? ""}
-          userDisplayName={profile?.full_name ?? null}
-        />
-        <ContentContainer className="flex-1 py-8 sm:py-10">
-          <div className="min-h-[50vh]">{children}</div>
-        </ContentContainer>
-      </div>
-    </div>
+      <Toaster closeButton />
+    </>
   );
 }

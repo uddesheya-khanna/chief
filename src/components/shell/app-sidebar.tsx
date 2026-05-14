@@ -49,7 +49,7 @@ export function AppSidebar({ orgSlug, organizations }: AppSidebarProps) {
         <OrgSwitcher organizations={organizations} currentSlug={orgSlug} />
       </div>
       <Separator className="bg-sidebar-border/80" />
-      <nav className="flex flex-1 flex-col gap-8 overflow-y-auto px-3 py-6">
+      <nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-5">
         <NavSection title="Intelligence" items={intelligenceNav(orgSlug)} />
         <NavSection title="Entities" items={entitiesNav(orgSlug)} />
         <NavSection title="System" items={systemNav(orgSlug)} />
