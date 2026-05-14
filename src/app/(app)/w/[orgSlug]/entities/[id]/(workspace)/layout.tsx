@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { EntityDetailView } from "@/modules/entities/components/entity-detail-view";
+import { EntityWorkspaceShell } from "@/modules/entities/components/entity-workspace-shell";
 import { getTrackedEntity } from "@/modules/entities/loaders";
 import { getWorkspaceContext } from "@/modules/org/workspace-context";
 
@@ -18,12 +18,14 @@ export async function generateMetadata({
   if (!entity) {
     return { title: "Entity" };
   }
-  return { title: entity.name };
+  return { title: `${entity.name} · Chief` };
 }
 
-export default async function EntityDetailPage({
+export default async function EntityWorkspaceLayout({
+  children,
   params,
 }: {
+  children: React.ReactNode;
   params: Promise<{ orgSlug: string; id: string }>;
 }) {
   const { orgSlug, id } = await params;
@@ -37,5 +39,9 @@ export default async function EntityDetailPage({
     notFound();
   }
 
-  return <EntityDetailView orgSlug={orgSlug} entity={entity} />;
+  return (
+    <EntityWorkspaceShell orgSlug={orgSlug} entity={entity}>
+      {children}
+    </EntityWorkspaceShell>
+  );
 }

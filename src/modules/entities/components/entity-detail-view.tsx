@@ -26,7 +26,7 @@ function formatLongDate(iso: string) {
   }
 }
 
-export function EntityDetailView({
+export function EntityDetailHeader({
   orgSlug,
   entity,
 }: {
@@ -34,96 +34,109 @@ export function EntityDetailView({
   entity: TrackedEntityRow;
 }) {
   const type = isEntityType(entity.type) ? entity.type : "market";
+
+  return (
+    <div className="flex flex-col gap-6 border-b border-border/70 pb-8 lg:flex-row lg:items-start lg:justify-between">
+      <div className="min-w-0 space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <EntityTypeBadge type={type} />
+          {entity.domain ? (
+            <a
+              href={`https://${entity.domain}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 font-mono text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+            >
+              {entity.domain}
+              <ArrowUpRight className="size-3.5" />
+            </a>
+          ) : null}
+        </div>
+        <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+          {entity.name}
+        </h1>
+        <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          {entity.description?.trim()
+            ? entity.description
+            : "No positioning narrative yet. Edit this entity to capture why it matters to your office."}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Last updated {formatLongDate(entity.updated_at)}
+        </p>
+      </div>
+      <div className="flex shrink-0 flex-col items-stretch gap-2 sm:flex-row sm:items-center lg:flex-col lg:items-end">
+        <EntityActiveToggle
+          orgSlug={orgSlug}
+          entityId={entity.id}
+          isActive={entity.is_active}
+        />
+        <Link
+          href={entityEditHref(orgSlug, entity.id)}
+          className={cn(
+            buttonVariants({ variant: "outline", size: "sm" }),
+            "inline-flex items-center justify-center gap-1.5",
+          )}
+        >
+          <Pencil className="size-3.5" />
+          Edit profile
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export function EntityReferencePanel({ entity }: { entity: TrackedEntityRow }) {
   const meta = normalizeMetadata(entity.metadata);
 
   return (
-    <div className="space-y-10">
-      <div className="flex flex-col gap-6 border-b border-border/70 pb-8 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <EntityTypeBadge type={type} />
-            {entity.domain ? (
-              <a
-                href={`https://${entity.domain}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 font-mono text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-              >
-                {entity.domain}
-                <ArrowUpRight className="size-3.5" />
-              </a>
-            ) : null}
-          </div>
-          <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            {entity.name}
-          </h1>
-          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            {entity.description?.trim()
-              ? entity.description
-              : "No positioning narrative yet. Edit this entity to capture why it matters to your office."}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Last updated {formatLongDate(entity.updated_at)}
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-col items-stretch gap-2 sm:flex-row sm:items-center lg:flex-col lg:items-end">
-          <EntityActiveToggle
-            orgSlug={orgSlug}
-            entityId={entity.id}
-            isActive={entity.is_active}
-          />
-          <Link
-            href={entityEditHref(orgSlug, entity.id)}
-            className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "inline-flex items-center justify-center gap-1.5",
-            )}
-          >
-            <Pencil className="size-3.5" />
-            Edit profile
-          </Link>
-        </div>
+    <section className="space-y-4">
+      <div className="space-y-1">
+        <h2 className="font-heading text-lg font-semibold tracking-tight">
+          Reference
+        </h2>
+        <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          Structured links and internal notes stay with the entity for downstream
+          intelligence.
+        </p>
       </div>
+      <dl className="grid gap-6 sm:grid-cols-2">
+        <MetaItem label="LinkedIn" value={meta.linkedin_url as string | undefined} />
+        <MetaItem label="Crunchbase" value={meta.crunchbase_url as string | undefined} />
+        <MetaItem label="Ticker" value={meta.ticker as string | undefined} />
+        <MetaItem label="Notes" value={meta.notes as string | undefined} wide />
+      </dl>
+    </section>
+  );
+}
 
-      <section className="space-y-4">
-        <div className="space-y-1">
-          <h2 className="font-heading text-lg font-semibold tracking-tight">
-            Reference
-          </h2>
-          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Structured links and internal notes stay with the entity for
-            downstream intelligence.
-          </p>
-        </div>
-        <dl className="grid gap-6 sm:grid-cols-2">
-          <MetaItem label="LinkedIn" value={meta.linkedin_url as string | undefined} />
-          <MetaItem label="Crunchbase" value={meta.crunchbase_url as string | undefined} />
-          <MetaItem label="Ticker" value={meta.ticker as string | undefined} />
-          <MetaItem label="Notes" value={meta.notes as string | undefined} wide />
-        </dl>
-      </section>
+export function EntityDetailFooterNav({
+  orgSlug,
+  entity,
+}: {
+  orgSlug: string;
+  entity: TrackedEntityRow;
+}) {
+  const type = isEntityType(entity.type) ? entity.type : "market";
 
-      <Separator className="opacity-60" />
-
-      <section className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-        <span>
-          View in{" "}
-          <Link
-            href={entityTypeHref(orgSlug, type)}
-            className="font-medium text-foreground underline-offset-4 hover:underline"
-          >
-            {type} list
-          </Link>
-        </span>
-        <span className="text-border">·</span>
+  return (
+    <section className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+      <span>
+        View in{" "}
         <Link
-          href={workspaceHref(orgSlug, "/entities")}
+          href={entityTypeHref(orgSlug, type)}
           className="font-medium text-foreground underline-offset-4 hover:underline"
         >
-          Full directory
+          {type} list
         </Link>
-      </section>
-    </div>
+      </span>
+      <span className="text-border">·</span>
+      <Link
+        href={workspaceHref(orgSlug, "/entities")}
+        className="font-medium text-foreground underline-offset-4 hover:underline"
+      >
+        Full directory
+      </Link>
+    </section>
   );
 }
 

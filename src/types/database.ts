@@ -149,6 +149,84 @@ export interface Database {
           },
         ];
       };
+      intelligence_events: {
+        Row: {
+          id: string;
+          organization_id: string;
+          entity_id: string;
+          source_url: string | null;
+          source_type: string;
+          event_type: string;
+          title: string;
+          summary: string;
+          implication: string | null;
+          raw_content: string | null;
+          signal_score: number;
+          metadata: Json;
+          is_dismissed: boolean;
+          dismissed_at: string | null;
+          dismissed_by: string | null;
+          detected_at: string;
+          published_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          entity_id: string;
+          source_url?: string | null;
+          source_type: string;
+          event_type: string;
+          title: string;
+          summary: string;
+          implication?: string | null;
+          raw_content?: string | null;
+          signal_score?: number;
+          metadata?: Json;
+          is_dismissed?: boolean;
+          dismissed_at?: string | null;
+          dismissed_by?: string | null;
+          detected_at?: string;
+          published_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          entity_id?: string;
+          source_url?: string | null;
+          source_type?: string;
+          event_type?: string;
+          title?: string;
+          summary?: string;
+          implication?: string | null;
+          raw_content?: string | null;
+          signal_score?: number;
+          metadata?: Json;
+          is_dismissed?: boolean;
+          dismissed_at?: string | null;
+          dismissed_by?: string | null;
+          detected_at?: string;
+          published_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "intelligence_events_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "intelligence_events_entity_id_fkey";
+            columns: ["entity_id"];
+            isOneToOne: false;
+            referencedRelation: "tracked_entities";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -168,3 +246,5 @@ export type OrganizationMember =
   Database["public"]["Tables"]["organization_members"]["Row"];
 export type TrackedEntity =
   Database["public"]["Tables"]["tracked_entities"]["Row"];
+export type IntelligenceEvent =
+  Database["public"]["Tables"]["intelligence_events"]["Row"];

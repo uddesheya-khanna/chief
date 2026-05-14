@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { EntityListQuery } from "@/modules/entities/schemas";
@@ -48,7 +49,7 @@ export async function listTrackedEntities(
   return data ?? [];
 }
 
-export async function getTrackedEntity(
+async function getTrackedEntityImpl(
   supabase: SupabaseClient<Database>,
   organizationId: string,
   entityId: string,
@@ -66,6 +67,9 @@ export async function getTrackedEntity(
   }
   return data;
 }
+
+/** Deduped per request (shared by entity layout and tab pages). */
+export const getTrackedEntity = cache(getTrackedEntityImpl);
 
 export function normalizeMetadata(raw: Json): Record<string, unknown> {
   if (raw && typeof raw === "object" && !Array.isArray(raw)) {
