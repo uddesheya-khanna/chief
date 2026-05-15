@@ -12,6 +12,7 @@ import {
   manualCreateEventFormSchema,
   updateSignalScoreFormSchema,
 } from "@/modules/events/schemas";
+import { embedIntelligenceEvent } from "@/jobs/embeddings";
 import { getWorkspaceContext } from "@/modules/org/workspace-context";
 import type { Json } from "@/types/database";
 
@@ -36,6 +37,7 @@ function revalidateIntelligenceSurfaces(orgSlug: string, entityId: string) {
   revalidatePath(`/w/${orgSlug}/entities/${entityId}`, "layout");
   revalidatePath(`/w/${orgSlug}/feed`);
   revalidatePath(`/w/${orgSlug}/dashboard`);
+  revalidatePath(`/w/${orgSlug}/search`);
 }
 
 export async function createManualIntelligenceEvent(
@@ -146,7 +148,10 @@ export async function createManualIntelligenceEvent(
     return { formError: "Failed to create signal." };
   }
 
+  void embedIntelligenceEvent(data.id);
+
   revalidateIntelligenceSurfaces(orgSlug, entityId);
+  revalidatePath(`/w/${orgSlug}/search`);
   redirect(entitySignalDetailHref(orgSlug, entityId, data.id));
 }
 

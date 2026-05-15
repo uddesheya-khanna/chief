@@ -6,16 +6,17 @@
 import { enrichIntelligenceFromDiff } from "@/lib/ai/pipelines/enrich-from-diff";
 import type { OrgIntelligenceContext } from "@/lib/ai/pipelines/enrich-from-diff";
 import {
-  findSimilarRecentEvent,
   hasRecentDuplicateUrl,
   shouldSuppressLowQualityEvent,
 } from "@/lib/ingestion/dedup";
+import { findSimilarRecentEventWithEmbeddings } from "@/lib/ingestion/dedup-embedding";
 import type {
   EntityIngestionTarget,
   IngestionResultType,
 } from "@/lib/ingestion/types";
 import type { IngestionEnrichmentPayload } from "@/lib/ingestion/pipeline";
 import type { RunIngestionResult } from "@/lib/ingestion/pipeline";
+import { embedIntelligenceEvent } from "@/jobs/embeddings";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { Json } from "@/types/database";
 
@@ -108,7 +109,7 @@ export async function persistIntelligenceFromIngestion(
     return { ok: false, reason: "suppressed" };
   }
 
-  const similar = await findSimilarRecentEvent({
+  const similar = await findSimilarRecentEventWithEmbeddings({
     organizationId: target.organizationId,
     entityId: target.entityId,
     eventType: enriched.eventType,
@@ -165,6 +166,8 @@ export async function persistIntelligenceFromIngestion(
     eventType: enriched.eventType,
     signalScore: enriched.signalScore,
   });
+
+  void embedIntelligenceEvent(event.id);
 
   return { ok: true, eventId: event.id };
 }

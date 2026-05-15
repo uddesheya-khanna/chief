@@ -5,17 +5,22 @@ import { useSelectedLayoutSegments } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { entityDetailHref } from "@/modules/entities/entity-url";
+import { entityRelationsHref } from "@/modules/entities/entity-url";
 import {
   entitySettingsHref,
   entitySignalsHref,
 } from "@/modules/events/event-url";
 
-type EntitySectionTab = "Timeline" | "Signals" | "Settings";
+type EntitySectionTab = "Timeline" | "Signals" | "Relations" | "Settings";
 
 const tabs = (orgSlug: string, entityId: string) =>
   [
     { label: "Timeline" as const, href: entityDetailHref(orgSlug, entityId) },
     { label: "Signals" as const, href: entitySignalsHref(orgSlug, entityId) },
+    {
+      label: "Relations" as const,
+      href: entityRelationsHref(orgSlug, entityId),
+    },
     { label: "Settings" as const, href: entitySettingsHref(orgSlug, entityId) },
   ] as const;
 
@@ -26,6 +31,9 @@ function activeTabFromSegments(segments: readonly string[]): EntitySectionTab {
   }
   if (root === "signals") {
     return "Signals";
+  }
+  if (root === "relations") {
+    return "Relations";
   }
   return "Timeline";
 }

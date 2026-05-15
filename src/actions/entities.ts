@@ -8,6 +8,7 @@ import {
   entityMetadataSchema,
   updateEntityFormSchema,
 } from "@/modules/entities/schemas";
+import { embedTrackedEntity } from "@/jobs/embeddings";
 import { getWorkspaceContext } from "@/modules/org/workspace-context";
 import type { Json } from "@/types/database";
 
@@ -95,6 +96,8 @@ export async function createEntity(
   if (error) {
     return { formError: error.message };
   }
+
+  void embedTrackedEntity(data.id);
 
   revalidatePath(`/w/${orgSlug}`, "layout");
   redirect(`/w/${orgSlug}/entities/${data.id}`);

@@ -299,12 +299,140 @@ export interface Database {
           },
         ];
       };
+      intelligence_embeddings: {
+        Row: {
+          id: string;
+          organization_id: string;
+          source_type: string;
+          source_id: string;
+          chunk_kind: string;
+          chunk_index: number;
+          content: string;
+          content_hash: string;
+          embedding: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          source_type: string;
+          source_id: string;
+          chunk_kind: string;
+          chunk_index?: number;
+          content: string;
+          content_hash: string;
+          embedding?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          source_type?: string;
+          source_id?: string;
+          chunk_kind?: string;
+          chunk_index?: number;
+          content?: string;
+          content_hash?: string;
+          embedding?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      entity_relationships: {
+        Row: {
+          id: string;
+          organization_id: string;
+          from_entity_id: string;
+          to_entity_id: string;
+          relationship_type: string;
+          metadata: Json;
+          valid_from: string | null;
+          valid_until: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          from_entity_id: string;
+          to_entity_id: string;
+          relationship_type: string;
+          metadata?: Json;
+          valid_from?: string | null;
+          valid_until?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          from_entity_id?: string;
+          to_entity_id?: string;
+          relationship_type?: string;
+          metadata?: Json;
+          valid_from?: string | null;
+          valid_until?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      event_relationships: {
+        Row: {
+          id: string;
+          organization_id: string;
+          from_event_id: string;
+          to_event_id: string;
+          relationship_type: string;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          from_event_id: string;
+          to_event_id: string;
+          relationship_type: string;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          from_event_id?: string;
+          to_event_id?: string;
+          relationship_type?: string;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
       create_organization_with_owner: {
         Args: { p_name: string; p_slug: string };
         Returns: string;
+      };
+      match_intelligence_embeddings: {
+        Args: {
+          p_organization_id: string;
+          p_query_embedding: string;
+          p_match_count?: number;
+          p_min_similarity?: number;
+        };
+        Returns: {
+          source_type: string;
+          source_id: string;
+          chunk_kind: string;
+          semantic_similarity: number;
+        }[];
       };
     };
     Enums: Record<string, never>;

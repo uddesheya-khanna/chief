@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { getTrackedEntity } from "@/modules/entities/loaders";
+import { EntityMemoryPanel } from "@/modules/history/components/entity-memory-panel";
 import { SignalTimeline } from "@/modules/events/components/signal-timeline";
 import { listIntelligenceEventsForEntity } from "@/modules/events/loaders";
 import { EntityIngestionPanel } from "@/modules/ingestion/components/entity-ingestion-panel";
@@ -39,6 +40,9 @@ export default async function EntityTimelinePage({
         summary={ingestionSummary}
         compact
       />
+
+      <EntityMemoryPanel orgSlug={orgSlug} entityId={id} events={events} />
+
       <div className="space-y-4">
         <div className="space-y-1">
           <h2 className="font-heading text-lg font-semibold tracking-tight text-foreground">

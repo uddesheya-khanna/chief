@@ -8,6 +8,10 @@ export function entityEditHref(orgSlug: string, entityId: string) {
   return workspaceHref(orgSlug, `/entities/${entityId}/edit`);
 }
 
+export function entityRelationsHref(orgSlug: string, entityId: string) {
+  return workspaceHref(orgSlug, `/entities/${entityId}/relations`);
+}
+
 export function entityNewHref(orgSlug: string, type?: string) {
   const base = workspaceHref(orgSlug, "/entities/new");
   return type ? `${base}?type=${encodeURIComponent(type)}` : base;
