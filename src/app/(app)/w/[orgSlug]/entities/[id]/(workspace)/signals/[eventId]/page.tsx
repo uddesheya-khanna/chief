@@ -19,8 +19,9 @@ export async function generateMetadata({
     ctx.supabase,
     ctx.organization.id,
     eventId,
+    { entityId: id },
   );
-  if (!event || event.entity_id !== id) {
+  if (!event) {
     return { title: "Signal" };
   }
   return { title: `${event.title} · Chief` };
@@ -46,8 +47,9 @@ export default async function EntitySignalDetailPage({
     ctx.supabase,
     ctx.organization.id,
     eventId,
+    { entityId: id },
   );
-  if (!event || event.entity_id !== id) {
+  if (!event) {
     notFound();
   }
 

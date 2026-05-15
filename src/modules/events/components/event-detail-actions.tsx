@@ -1,8 +1,7 @@
-"use client";
-
-import type { IntelligenceEventRow } from "@/modules/events/loaders";
 import { dismissIntelligenceEvent, restoreIntelligenceEvent } from "@/actions/events";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { IntelligenceEventRow } from "@/modules/events/loaders";
 
 export function EventDetailActions({
   orgSlug,
@@ -20,18 +19,24 @@ export function EventDetailActions({
           <input type="hidden" name="orgSlug" value={orgSlug} />
           <input type="hidden" name="entityId" value={entityId} />
           <input type="hidden" name="eventId" value={event.id} />
-          <Button type="submit" variant="outline" size="sm">
+          <button
+            type="submit"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          >
             Restore to feed
-          </Button>
+          </button>
         </form>
       ) : (
         <form action={dismissIntelligenceEvent}>
           <input type="hidden" name="orgSlug" value={orgSlug} />
           <input type="hidden" name="entityId" value={entityId} />
           <input type="hidden" name="eventId" value={event.id} />
-          <Button type="submit" variant="outline" size="sm">
+          <button
+            type="submit"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          >
             Dismiss
-          </Button>
+          </button>
         </form>
       )}
     </div>

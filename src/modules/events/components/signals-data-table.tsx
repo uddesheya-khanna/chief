@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   EVENT_TYPE_LABEL,
@@ -171,9 +171,15 @@ export function SignalsDataTable({
                         <input type="hidden" name="orgSlug" value={orgSlug} />
                         <input type="hidden" name="entityId" value={entityId} />
                         <input type="hidden" name="eventId" value={ev.id} />
-                        <Button type="submit" variant="outline" size="sm" className="h-8">
+                        <button
+                          type="submit"
+                          className={cn(
+                            buttonVariants({ variant: "outline", size: "sm" }),
+                            "h-8",
+                          )}
+                        >
                           Dismiss
-                        </Button>
+                        </button>
                       </form>
                     ) : null}
                   </div>

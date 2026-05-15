@@ -5,7 +5,7 @@ export default function EntityWorkspaceLoading() {
     <div className="space-y-8">
       <div className="space-y-4 border-b border-border/60 pb-8">
         <Skeleton className="h-5 w-24" />
-        <Skeleton className="h-10 w-2/3 max-w-xl" />
+        <Skeleton className="h-10 w-full max-w-xl" />
         <Skeleton className="h-4 w-full max-w-2xl" />
         <Skeleton className="h-4 w-40" />
       </div>

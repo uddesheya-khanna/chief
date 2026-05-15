@@ -16,6 +16,9 @@ export const EVENT_TYPES = [
   "funding",
   "exec_move",
   "partnership",
+  "positioning_change",
+  "market_expansion",
+  "compliance_security",
   "other",
 ] as const;
 
@@ -28,6 +31,9 @@ export const EVENT_TYPE_LABEL: Record<EventType, string> = {
   funding: "Funding",
   exec_move: "Leadership",
   partnership: "Partnership",
+  positioning_change: "Positioning",
+  market_expansion: "Expansion",
+  compliance_security: "Compliance",
   other: "Other",
 };
 

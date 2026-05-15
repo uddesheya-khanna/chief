@@ -1,8 +1,13 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { queryWorkspaceIntelligenceFeed } from "@/modules/events/loaders";
+import { workspaceFeedHref } from "@/modules/feed/feed-href";
 import { WorkspaceFeedView } from "@/modules/feed/components/workspace-feed-view";
-import { parseWorkspaceFeedQuery } from "@/modules/feed/search-params";
+import {
+  clampWorkspaceFeedPage,
+  parseWorkspaceFeedQuery,
+  serializeWorkspaceFeedQuery,
+} from "@/modules/feed/search-params";
 import { getWorkspaceContext } from "@/modules/org/workspace-context";
 
 export default async function FeedPage({
@@ -18,12 +23,19 @@ export default async function FeedPage({
     notFound();
   }
 
-  const feedQuery = parseWorkspaceFeedQuery(await searchParams);
+  const rawQuery = parseWorkspaceFeedQuery(await searchParams);
   const { events, total, error } = await queryWorkspaceIntelligenceFeed(
     ctx.supabase,
     ctx.organization.id,
-    feedQuery,
+    rawQuery,
   );
+
+  const feedQuery = clampWorkspaceFeedPage(rawQuery, total);
+  if (feedQuery.page !== rawQuery.page) {
+    redirect(
+      workspaceFeedHref(orgSlug, serializeWorkspaceFeedQuery(feedQuery)),
+    );
+  }
 
   return (
     <WorkspaceFeedView

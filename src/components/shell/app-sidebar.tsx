@@ -19,7 +19,12 @@ function NavSection({ title, items }: { title: string; items: NavItem[] }) {
       </p>
       <div className="space-y-0.5">
         {items.map((item) => (
-          <NavLink key={item.href} href={item.href} className="font-medium">
+          <NavLink
+            key={item.href}
+            href={item.href}
+            match={item.match}
+            className="font-medium"
+          >
             <item.icon className="size-4 text-muted-foreground" />
             {item.label}
           </NavLink>
@@ -36,7 +41,7 @@ type AppSidebarProps = {
 
 export function AppSidebar({ orgSlug, organizations }: AppSidebarProps) {
   return (
-    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
+    <aside className="flex h-full w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="flex h-14 items-center px-4">
         <Link
           href="/"

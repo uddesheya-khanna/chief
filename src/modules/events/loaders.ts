@@ -46,13 +46,19 @@ export async function getIntelligenceEvent(
   supabase: SupabaseClient<Database>,
   organizationId: string,
   eventId: string,
+  options?: { entityId?: string },
 ): Promise<IntelligenceEventRow | null> {
-  const { data, error } = await supabase
+  let qb = supabase
     .from("intelligence_events")
     .select(EVENT_LIST_COLUMNS)
     .eq("organization_id", organizationId)
-    .eq("id", eventId)
-    .maybeSingle();
+    .eq("id", eventId);
+
+  if (options?.entityId) {
+    qb = qb.eq("entity_id", options.entityId);
+  }
+
+  const { data, error } = await qb.maybeSingle();
 
   if (error) {
     console.error("[events:get]", error.message);

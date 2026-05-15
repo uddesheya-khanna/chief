@@ -20,9 +20,9 @@ export function WorkspaceFeedPagination({
 }) {
   const pageSize = WORKSPACE_FEED_PAGE_SIZE;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const page = Math.min(query.page, totalPages);
+  const page = Math.min(Math.max(1, query.page), totalPages);
 
-  if (totalPages <= 1) {
+  if (total <= 0 || totalPages <= 1) {
     return null;
   }
 

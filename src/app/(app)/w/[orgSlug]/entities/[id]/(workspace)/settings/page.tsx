@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { EntityReferencePanel } from "@/modules/entities/components/entity-detail-view";
 import { entityEditHref } from "@/modules/entities/entity-url";
 import { getTrackedEntity } from "@/modules/entities/loaders";
+import { EntityIngestionPanel } from "@/modules/ingestion/components/entity-ingestion-panel";
+import { getEntityIngestionSummary } from "@/modules/ingestion/loaders";
 import { getWorkspaceContext } from "@/modules/org/workspace-context";
 
 export default async function EntitySettingsTabPage({
@@ -23,6 +25,12 @@ export default async function EntitySettingsTabPage({
   if (!entity) {
     notFound();
   }
+
+  const ingestionSummary = await getEntityIngestionSummary(
+    ctx.supabase,
+    ctx.organization.id,
+    id,
+  );
 
   return (
     <div className="space-y-8">
@@ -44,6 +52,11 @@ export default async function EntitySettingsTabPage({
           Open profile editor
         </Link>
       </div>
+      <EntityIngestionPanel
+        orgSlug={orgSlug}
+        entity={entity}
+        summary={ingestionSummary}
+      />
       <EntityReferencePanel entity={entity} />
     </div>
   );

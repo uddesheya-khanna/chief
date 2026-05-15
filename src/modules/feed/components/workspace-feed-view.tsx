@@ -7,6 +7,7 @@ import { FeedNewSignalsBanner } from "@/modules/feed/components/feed-new-signals
 import { WorkspaceFeedFilters } from "@/modules/feed/components/workspace-feed-filters";
 import { WorkspaceFeedPagination } from "@/modules/feed/components/workspace-feed-pagination";
 import type { WorkspaceFeedQuery } from "@/modules/feed/search-params";
+import { serializeWorkspaceFeedQuery } from "@/modules/feed/search-params";
 
 export function WorkspaceFeedView({
   orgSlug,
@@ -24,13 +25,17 @@ export function WorkspaceFeedView({
   const baseline = events[0]?.detected_at ?? null;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="mx-auto max-w-4xl space-y-7">
       <PageHeader
         title="Intelligence feed"
         description="Chronological workspace signals. Filter by entity class, event type, score band, and time window. Dismiss items to keep the surface operational."
       />
 
-      <WorkspaceFeedFilters orgSlug={orgSlug} query={query} />
+      <WorkspaceFeedFilters
+        key={serializeWorkspaceFeedQuery(query)}
+        orgSlug={orgSlug}
+        query={query}
+      />
 
       <FeedNewSignalsBanner orgSlug={orgSlug} baselineDetectedAt={baseline} />
 

@@ -8,6 +8,10 @@ import {
   isEntityType,
 } from "@/modules/entities/constants";
 import {
+  formatConfidence,
+  parseEventAiMetadata,
+} from "@/modules/events/ai-metadata";
+import {
   EVENT_TYPE_LABEL,
   SOURCE_TYPE_LABEL,
   signalBand,
@@ -45,6 +49,7 @@ export function FeedIntelligenceRow({
   event: FeedEventWithEntity;
 }) {
   const band = signalBand(event.signal_score);
+  const aiMeta = parseEventAiMetadata(event.metadata);
   const entityName =
     event.tracked_entities?.name?.trim() || "Unknown entity";
   const entityType = event.tracked_entities?.type;
@@ -76,6 +81,11 @@ export function FeedIntelligenceRow({
         <span className="font-mono tabular-nums text-[12px] text-foreground/80">
           {event.signal_score}
         </span>
+        {aiMeta ? (
+          <span className="text-[11px] text-muted-foreground">
+            · {formatConfidence(aiMeta.classification.confidence)} conf.
+          </span>
+        ) : null}
         <time
           dateTime={event.detected_at}
           className="ml-auto font-mono text-[12px] tabular-nums"

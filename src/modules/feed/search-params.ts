@@ -49,13 +49,19 @@ const workspaceFeedQuerySchema = z
       .filter((r) => r.success)
       .map((r) => r.data);
 
+    let dateFrom = o.from?.trim() ? o.from.trim() : null;
+    let dateTo = o.to?.trim() ? o.to.trim() : null;
+    if (dateFrom && dateTo && dateFrom > dateTo) {
+      [dateFrom, dateTo] = [dateTo, dateFrom];
+    }
+
     return {
       page: o.page,
       entityTypes,
       eventTypes,
       signalLevels,
-      dateFrom: o.from?.trim() ? o.from.trim() : null,
-      dateTo: o.to?.trim() ? o.to.trim() : null,
+      dateFrom,
+      dateTo,
       includeDismissed: o.dismissed === "1",
     };
   });
@@ -124,4 +130,21 @@ export function serializeWorkspaceFeedQuery(
     p.set("dismissed", "1");
   }
   return p.toString();
+}
+
+export function clampWorkspaceFeedPage(
+  query: WorkspaceFeedQuery,
+  total: number,
+): WorkspaceFeedQuery {
+  if (total <= 0) {
+    return query.page === 1 ? query : { ...query, page: 1 };
+  }
+  const totalPages = Math.max(
+    1,
+    Math.ceil(total / WORKSPACE_FEED_PAGE_SIZE),
+  );
+  if (query.page <= totalPages) {
+    return query;
+  }
+  return { ...query, page: totalPages };
 }

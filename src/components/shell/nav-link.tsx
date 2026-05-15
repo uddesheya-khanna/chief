@@ -6,20 +6,22 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 type NavLinkProps = React.ComponentProps<typeof Link> & {
-  activePrefix?: boolean;
+  /** `exact` — only the href path; `prefix` — href or nested paths (default). */
+  match?: "exact" | "prefix";
 };
 
 export function NavLink({
   className,
-  activePrefix = true,
+  match = "prefix",
   href,
   ...props
 }: NavLinkProps) {
   const pathname = usePathname();
   const hrefStr = typeof href === "string" ? href : href.pathname ?? "";
-  const active = activePrefix
-    ? pathname === hrefStr || pathname.startsWith(`${hrefStr}/`)
-    : pathname === hrefStr;
+  const active =
+    match === "exact"
+      ? pathname === hrefStr
+      : pathname === hrefStr || pathname.startsWith(`${hrefStr}/`);
 
   return (
     <Link

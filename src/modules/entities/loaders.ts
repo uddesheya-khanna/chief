@@ -9,6 +9,9 @@ import type { EntityType } from "./constants";
 export type TrackedEntityRow =
   Database["public"]["Tables"]["tracked_entities"]["Row"];
 
+const TRACKED_ENTITY_COLUMNS =
+  "id, organization_id, type, name, domain, description, metadata, is_active, created_by, created_at, updated_at";
+
 function sanitizeSearch(q: string): string {
   return q.replace(/[%_\\]/g, "").trim();
 }
@@ -20,7 +23,7 @@ export async function listTrackedEntities(
 ): Promise<TrackedEntityRow[]> {
   let qb = supabase
     .from("tracked_entities")
-    .select("*")
+    .select(TRACKED_ENTITY_COLUMNS)
     .eq("organization_id", organizationId);
 
   if (query.type) {
@@ -56,7 +59,7 @@ async function getTrackedEntityImpl(
 ): Promise<TrackedEntityRow | null> {
   const { data, error } = await supabase
     .from("tracked_entities")
-    .select("*")
+    .select(TRACKED_ENTITY_COLUMNS)
     .eq("organization_id", organizationId)
     .eq("id", entityId)
     .maybeSingle();

@@ -7,7 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { EventDetailActions } from "@/modules/events/components/event-detail-actions";
+import { EventIntelligenceMeta } from "@/modules/events/components/event-intelligence-meta";
 import { EventSignalScoreForm } from "@/modules/events/components/event-signal-score-form";
+import { parseEventAiMetadata } from "@/modules/events/ai-metadata";
 import {
   EVENT_TYPE_LABEL,
   SOURCE_TYPE_LABEL,
@@ -66,7 +68,9 @@ export function EventDetailView({
 }) {
   const band = signalBand(event.signal_score);
   const backHref = entitySignalsHref(orgSlug, entityId);
-  const metadataBlock = formatMetadataBlock(event.metadata);
+  const hasAiMeta = parseEventAiMetadata(event.metadata) !== null;
+  const metadataBlock =
+    !hasAiMeta ? formatMetadataBlock(event.metadata) : null;
 
   return (
     <div className="space-y-8">
@@ -129,7 +133,7 @@ export function EventDetailView({
             <h2 className="text-[12px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
               Strategic implication
             </h2>
-            <p className="max-w-3xl text-sm leading-relaxed italic text-muted-foreground">
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
               {event.implication}
             </p>
             <p className="text-[12px] text-muted-foreground">
@@ -137,6 +141,8 @@ export function EventDetailView({
             </p>
           </section>
         ) : null}
+
+        <EventIntelligenceMeta metadata={event.metadata} />
 
         {event.raw_content?.trim() ? (
           <section className="space-y-2">
@@ -195,8 +201,8 @@ export function EventDetailView({
             Signal score override
           </h2>
           <p className="max-w-xl text-sm text-muted-foreground">
-            Adjust relevance ranking for this event. Automated scoring will
-            replace this when the intelligence pipeline is enabled.
+            Override the automated score when you have context the pipeline
+            does not.
           </p>
           <EventSignalScoreForm
             orgSlug={orgSlug}

@@ -14,6 +14,7 @@ export type NavItem = {
   label: string;
   href: string;
   icon: typeof LayoutDashboard;
+  match?: "exact" | "prefix";
 };
 
 export function workspaceHref(orgSlug: string, path: string) {
@@ -32,7 +33,12 @@ export function intelligenceNav(orgSlug: string): NavItem[] {
 export function entitiesNav(orgSlug: string): NavItem[] {
   const w = (p: string) => workspaceHref(orgSlug, p);
   return [
-    { label: "Directory", href: w("/entities"), icon: Layers },
+    {
+      label: "Directory",
+      href: w("/entities"),
+      icon: Layers,
+      match: "exact",
+    },
     { label: "Competitors", href: w("/competitors"), icon: Users },
     { label: "Investors", href: w("/investors"), icon: Building2 },
     { label: "Partners", href: w("/partners"), icon: Handshake },

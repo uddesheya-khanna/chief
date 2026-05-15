@@ -227,6 +227,78 @@ export interface Database {
           },
         ];
       };
+      ingestion_jobs: {
+        Row: {
+          id: string;
+          organization_id: string;
+          entity_id: string;
+          rule_id: string | null;
+          source_type: string;
+          source_url: string;
+          status: string;
+          result_type: string | null;
+          raw_content: string | null;
+          snapshot_path: string | null;
+          previous_snapshot_path: string | null;
+          diff_summary: string | null;
+          error_message: string | null;
+          started_at: string | null;
+          completed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          entity_id: string;
+          rule_id?: string | null;
+          source_type: string;
+          source_url: string;
+          status?: string;
+          result_type?: string | null;
+          raw_content?: string | null;
+          snapshot_path?: string | null;
+          previous_snapshot_path?: string | null;
+          diff_summary?: string | null;
+          error_message?: string | null;
+          started_at?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          entity_id?: string;
+          rule_id?: string | null;
+          source_type?: string;
+          source_url?: string;
+          status?: string;
+          result_type?: string | null;
+          raw_content?: string | null;
+          snapshot_path?: string | null;
+          previous_snapshot_path?: string | null;
+          diff_summary?: string | null;
+          error_message?: string | null;
+          started_at?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ingestion_jobs_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ingestion_jobs_entity_id_fkey";
+            columns: ["entity_id"];
+            isOneToOne: false;
+            referencedRelation: "tracked_entities";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -248,3 +320,5 @@ export type TrackedEntity =
   Database["public"]["Tables"]["tracked_entities"]["Row"];
 export type IntelligenceEvent =
   Database["public"]["Tables"]["intelligence_events"]["Row"];
+export type IngestionJob =
+  Database["public"]["Tables"]["ingestion_jobs"]["Row"];

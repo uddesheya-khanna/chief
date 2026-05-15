@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -39,10 +39,6 @@ export function WorkspaceFeedFilters({
   const [pending, startTransition] = useTransition();
   const [draft, setDraft] = useState(query);
 
-  useEffect(() => {
-    setDraft(query);
-  }, [query]);
-
   const apply = useCallback(() => {
     const qs = serializeWorkspaceFeedQuery(draft);
     startTransition(() => {
@@ -57,7 +53,10 @@ export function WorkspaceFeedFilters({
   }, [orgSlug, router]);
 
   return (
-    <div className="space-y-4 rounded-lg border border-border/70 bg-card/50 p-4">
+    <div
+      className="space-y-4 rounded-lg border border-border/70 bg-card/50 p-4"
+      aria-busy={pending}
+    >
       <div className="flex flex-wrap items-end justify-between gap-3">
         <p className="text-[12px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
           Filters
