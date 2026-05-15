@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { queryWorkspaceIntelligenceFeed } from "@/modules/events/loaders";
 import { workspaceFeedHref } from "@/modules/feed/feed-href";
 import { WorkspaceFeedView } from "@/modules/feed/components/workspace-feed-view";
+import { listBookmarkedEventIds } from "@/modules/workflow/loaders";
 import {
   clampWorkspaceFeedPage,
   parseWorkspaceFeedQuery,
@@ -24,11 +25,16 @@ export default async function FeedPage({
   }
 
   const rawQuery = parseWorkspaceFeedQuery(await searchParams);
-  const { events, total, error } = await queryWorkspaceIntelligenceFeed(
-    ctx.supabase,
-    ctx.organization.id,
-    rawQuery,
-  );
+  const {
+    data: { user },
+  } = await ctx.supabase.auth.getUser();
+
+  const [{ events, total, error }, bookmarkedIds] = await Promise.all([
+    queryWorkspaceIntelligenceFeed(ctx.supabase, ctx.organization.id, rawQuery),
+    user
+      ? listBookmarkedEventIds(ctx.supabase, ctx.organization.id, user.id)
+      : Promise.resolve(new Set<string>()),
+  ]);
 
   const feedQuery = clampWorkspaceFeedPage(rawQuery, total);
   if (feedQuery.page !== rawQuery.page) {
@@ -44,6 +50,7 @@ export default async function FeedPage({
       events={events}
       total={total}
       errorMessage={error}
+      bookmarkedIds={bookmarkedIds}
     />
   );
 }

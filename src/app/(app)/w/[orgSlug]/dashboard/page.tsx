@@ -9,10 +9,12 @@ import {
 } from "@/modules/entities/constants";
 import { listTrackedEntities } from "@/modules/entities/loaders";
 import { parseEntityListQuery } from "@/modules/entities/search-params";
+import { getWorkspaceDeliveryInsights } from "@/lib/delivery/insights";
 import {
   getWorkspaceIntelligenceMetrics,
   listRecentWorkspaceFeedEvents,
 } from "@/modules/events/loaders";
+import { getLatestDigestByType } from "@/modules/digests/loaders";
 import { FeedIntelligenceRow } from "@/modules/feed/components/feed-intelligence-row";
 import { workspaceFeedHref } from "@/modules/feed/feed-href";
 import { getWorkspaceContext } from "@/modules/org/workspace-context";
@@ -32,7 +34,7 @@ export default async function DashboardPage({
 
   const orgId = ctx.organization.id;
 
-  const [metrics, recent, entities] = await Promise.all([
+  const [metrics, recent, entities, insights, latestDaily] = await Promise.all([
     getWorkspaceIntelligenceMetrics(ctx.supabase, orgId),
     listRecentWorkspaceFeedEvents(ctx.supabase, orgId, 8),
     listTrackedEntities(
@@ -40,6 +42,8 @@ export default async function DashboardPage({
       orgId,
       parseEntityListQuery({}),
     ),
+    getWorkspaceDeliveryInsights(ctx.supabase, orgId, orgSlug),
+    getLatestDigestByType(ctx.supabase, orgId, "daily"),
   ]);
 
   const topEntities = entities.slice(0, 10);
@@ -61,6 +65,50 @@ export default async function DashboardPage({
           mono
         />
       </div>
+
+      {(insights.length > 0 || latestDaily) && (
+        <section className="space-y-3">
+          <h2 className="text-[12px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
+            Delivery insights
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {latestDaily ? (
+              <Link
+                href={workspaceHref(orgSlug, `/digests/${latestDaily.id}`)}
+                className="rounded-lg border border-border/70 bg-card/50 px-4 py-3 transition-colors hover:bg-muted/20"
+              >
+                <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
+                  Latest daily digest
+                </p>
+                <p className="mt-1 text-sm font-medium text-foreground">
+                  {latestDaily.title}
+                </p>
+              </Link>
+            ) : null}
+            {insights.slice(0, latestDaily ? 2 : 3).map((insight) => (
+              <div
+                key={insight.id}
+                className="rounded-lg border border-border/70 bg-card/50 px-4 py-3"
+              >
+                <p className="text-sm font-medium text-foreground">
+                  {insight.label}
+                </p>
+                <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+                  {insight.description}
+                </p>
+                {insight.href ? (
+                  <Link
+                    href={insight.href}
+                    className="mt-2 inline-block text-xs text-primary underline-offset-4 hover:underline"
+                  >
+                    Review
+                  </Link>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] lg:items-start">
         <section className="space-y-3">

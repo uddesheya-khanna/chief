@@ -16,6 +16,7 @@ import type {
 } from "@/lib/ingestion/types";
 import type { IngestionEnrichmentPayload } from "@/lib/ingestion/pipeline";
 import type { RunIngestionResult } from "@/lib/ingestion/pipeline";
+import { processAlertsForEvent } from "@/jobs/alerts";
 import { embedIntelligenceEvent } from "@/jobs/embeddings";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { Json } from "@/types/database";
@@ -168,6 +169,7 @@ export async function persistIntelligenceFromIngestion(
   });
 
   void embedIntelligenceEvent(event.id);
+  void processAlertsForEvent(event.id);
 
   return { ok: true, eventId: event.id };
 }

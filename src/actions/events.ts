@@ -149,6 +149,8 @@ export async function createManualIntelligenceEvent(
   }
 
   void embedIntelligenceEvent(data.id);
+  const { processAlertsForEvent } = await import("@/jobs/alerts");
+  void processAlertsForEvent(data.id);
 
   revalidateIntelligenceSurfaces(orgSlug, entityId);
   revalidatePath(`/w/${orgSlug}/search`);

@@ -15,12 +15,14 @@ export function WorkspaceFeedView({
   events,
   total,
   errorMessage,
+  bookmarkedIds = new Set<string>(),
 }: {
   orgSlug: string;
   query: WorkspaceFeedQuery;
   events: FeedEventWithEntity[];
   total: number;
   errorMessage?: string;
+  bookmarkedIds?: Set<string>;
 }) {
   const baseline = events[0]?.detected_at ?? null;
 
@@ -67,7 +69,12 @@ export function WorkspaceFeedView({
         ) : (
           <div className="overflow-hidden rounded-lg border border-border/70 bg-card/30">
             {events.map((ev) => (
-              <FeedIntelligenceRow key={ev.id} orgSlug={orgSlug} event={ev} />
+              <FeedIntelligenceRow
+                key={ev.id}
+                orgSlug={orgSlug}
+                event={ev}
+                isBookmarked={bookmarkedIds.has(ev.id)}
+              />
             ))}
           </div>
         )}

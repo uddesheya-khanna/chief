@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { AppHeader } from "@/components/shell/app-header";
 import { AppSidebar } from "@/components/shell/app-sidebar";
 import { ContentContainer } from "@/components/primitives/content-container";
+import { countUnreadAlerts } from "@/modules/alerts/loaders";
 import { loadUserOrganizations } from "@/modules/org/loaders";
 import { getWorkspaceContext } from "@/modules/org/workspace-context";
 
@@ -42,7 +43,10 @@ export default async function WorkspaceLayout({
     notFound();
   }
 
-  const organizations = await loadUserOrganizations(ctx.supabase);
+  const [organizations, unreadAlertCount] = await Promise.all([
+    loadUserOrganizations(ctx.supabase),
+    countUnreadAlerts(ctx.supabase, ctx.organization.id),
+  ]);
 
   const { data: profile } = await ctx.supabase
     .from("profiles")
@@ -63,6 +67,7 @@ export default async function WorkspaceLayout({
             workspaceName={ctx.organization.name}
             userEmail={profile?.email ?? user.email ?? ""}
             userDisplayName={profile?.full_name ?? null}
+            unreadAlertCount={unreadAlertCount}
           />
           <ContentContainer className="flex-1 py-8 sm:py-10">
             <div className="min-h-[50vh]">{children}</div>

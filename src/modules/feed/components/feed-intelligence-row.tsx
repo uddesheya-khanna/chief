@@ -18,6 +18,7 @@ import {
 } from "@/modules/events/constants";
 import { entitySignalDetailHref } from "@/modules/events/event-url";
 import type { FeedEventWithEntity } from "@/modules/events/loaders";
+import { FeedBookmarkControl } from "@/modules/feed/components/feed-bookmark-control";
 import { FeedDismissControl } from "@/modules/feed/components/feed-dismiss-control";
 
 function formatDetected(iso: string) {
@@ -44,9 +45,11 @@ function bandBorderClass(band: ReturnType<typeof signalBand>) {
 export function FeedIntelligenceRow({
   orgSlug,
   event,
+  isBookmarked = false,
 }: {
   orgSlug: string;
   event: FeedEventWithEntity;
+  isBookmarked?: boolean;
 }) {
   const band = signalBand(event.signal_score);
   const aiMeta = parseEventAiMetadata(event.metadata);
@@ -143,6 +146,11 @@ export function FeedIntelligenceRow({
               Open
             </a>
           ) : null}
+          <FeedBookmarkControl
+            orgSlug={orgSlug}
+            eventId={event.id}
+            isBookmarked={isBookmarked}
+          />
           {!event.is_dismissed ? (
             <FeedDismissControl orgSlug={orgSlug} eventId={event.id} />
           ) : null}

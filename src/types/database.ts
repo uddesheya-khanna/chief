@@ -413,6 +413,284 @@ export interface Database {
         };
         Relationships: [];
       };
+      monitoring_rules: {
+        Row: {
+          id: string;
+          organization_id: string;
+          entity_id: string | null;
+          name: string;
+          is_active: boolean;
+          min_signal_score: number;
+          event_types: string[];
+          source_types: string[];
+          recency_hours: number;
+          last_triggered_at: string | null;
+          last_matched_event_id: string | null;
+          trigger_count: number;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          entity_id?: string | null;
+          name: string;
+          is_active?: boolean;
+          min_signal_score?: number;
+          event_types?: string[];
+          source_types?: string[];
+          recency_hours?: number;
+          last_triggered_at?: string | null;
+          last_matched_event_id?: string | null;
+          trigger_count?: number;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          entity_id?: string | null;
+          name?: string;
+          is_active?: boolean;
+          min_signal_score?: number;
+          event_types?: string[];
+          source_types?: string[];
+          recency_hours?: number;
+          last_triggered_at?: string | null;
+          last_matched_event_id?: string | null;
+          trigger_count?: number;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      intelligence_alerts: {
+        Row: {
+          id: string;
+          organization_id: string;
+          user_id: string | null;
+          event_id: string;
+          monitoring_rule_id: string | null;
+          severity: string;
+          title: string;
+          body: string;
+          explain: Json;
+          dedupe_key: string;
+          is_read: boolean;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          user_id?: string | null;
+          event_id: string;
+          monitoring_rule_id?: string | null;
+          severity: string;
+          title: string;
+          body: string;
+          explain?: Json;
+          dedupe_key: string;
+          is_read?: boolean;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          user_id?: string | null;
+          event_id?: string;
+          monitoring_rule_id?: string | null;
+          severity?: string;
+          title?: string;
+          body?: string;
+          explain?: Json;
+          dedupe_key?: string;
+          is_read?: boolean;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "intelligence_alerts_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "intelligence_events";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      alert_delivery_log: {
+        Row: {
+          id: string;
+          organization_id: string;
+          user_id: string | null;
+          channel: string;
+          delivery_type: string;
+          reference_id: string | null;
+          status: string;
+          error_message: string | null;
+          sent_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          user_id?: string | null;
+          channel: string;
+          delivery_type: string;
+          reference_id?: string | null;
+          status?: string;
+          error_message?: string | null;
+          sent_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          user_id?: string | null;
+          channel?: string;
+          delivery_type?: string;
+          reference_id?: string | null;
+          status?: string;
+          error_message?: string | null;
+          sent_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      intelligence_digests: {
+        Row: {
+          id: string;
+          organization_id: string;
+          digest_type: string;
+          title: string;
+          period_start: string;
+          period_end: string;
+          content: Json;
+          entity_id: string | null;
+          status: string;
+          generated_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          digest_type: string;
+          title: string;
+          period_start: string;
+          period_end: string;
+          content?: Json;
+          entity_id?: string | null;
+          status?: string;
+          generated_by?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          digest_type?: string;
+          title?: string;
+          period_start?: string;
+          period_end?: string;
+          content?: Json;
+          entity_id?: string | null;
+          status?: string;
+          generated_by?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      workflow_collections: {
+        Row: {
+          id: string;
+          organization_id: string;
+          user_id: string;
+          name: string;
+          collection_type: string;
+          description: string | null;
+          is_shared: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          user_id: string;
+          name: string;
+          collection_type: string;
+          description?: string | null;
+          is_shared?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          user_id?: string;
+          name?: string;
+          collection_type?: string;
+          description?: string | null;
+          is_shared?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      workflow_collection_items: {
+        Row: {
+          id: string;
+          organization_id: string;
+          collection_id: string;
+          item_type: string;
+          item_id: string;
+          note: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          collection_id: string;
+          item_type: string;
+          item_id: string;
+          note?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organization_id?: string;
+          collection_id?: string;
+          item_type?: string;
+          item_id?: string;
+          note?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      pinned_entities: {
+        Row: {
+          organization_id: string;
+          user_id: string;
+          entity_id: string;
+          pinned_at: string;
+        };
+        Insert: {
+          organization_id: string;
+          user_id: string;
+          entity_id: string;
+          pinned_at?: string;
+        };
+        Update: {
+          organization_id?: string;
+          user_id?: string;
+          entity_id?: string;
+          pinned_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

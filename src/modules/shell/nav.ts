@@ -1,6 +1,9 @@
 import {
+  Bell,
+  FileText,
   LayoutDashboard,
   LineChart,
+  Radar,
   Search,
   Settings2,
   Users,
@@ -8,6 +11,7 @@ import {
   Handshake,
   Globe2,
   Layers,
+  Bookmark,
 } from "lucide-react";
 
 export type NavItem = {
@@ -27,6 +31,10 @@ export function intelligenceNav(orgSlug: string): NavItem[] {
     { label: "Dashboard", href: w("/dashboard"), icon: LayoutDashboard },
     { label: "Feed", href: w("/feed"), icon: LineChart },
     { label: "Search", href: w("/search"), icon: Search },
+    { label: "Alerts", href: w("/alerts"), icon: Bell },
+    { label: "Digests", href: w("/digests"), icon: FileText },
+    { label: "Monitoring", href: w("/monitoring"), icon: Radar },
+    { label: "Watch", href: w("/watch"), icon: Bookmark },
   ];
 }
 
